@@ -1,0 +1,321 @@
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:400,500);
+/*
+ * Author: Jeff Stewart
+*/
+.ui-btn-inner, .ui-panel-inner, .ui-panel, body, div, ul, h1, h2, h3, p, li, span, a, strong, em{
+	font-family: Ubuntu, Arial, sans-serif !important;
+	text-shadow: none !important;
+	font-weight: normal !important;
+}
+
+/*
+Panel Settings
+*/
+
+.ui-panel-inner {margin: 0; padding: 0;}
+
+#map-panel h3, #details-panel h3, #main-menu h3 {
+	background: #3d464d;
+	color: #fff;
+	padding: 10px 20px;
+	margin: 0;
+}
+
+#stations-panel h4 {
+	font-weight: normal;
+	margin: 20px 0 0 20px;
+	padding: 0 0 0 30px;
+	background: url(../images/icons/circled-plus.jpg) left 2px no-repeat;
+	cursor: pointer;
+}
+
+#stations-panel h3 {
+	background: #3d464d;
+	color: #fff;
+	padding: 10px 20px;
+	margin: 0;
+}
+
+#locations {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#locations a:link {
+	color: #3d464d;
+	text-decoration: none;
+}
+
+#locations a:visited {
+	color: #3d464d;
+	text-decoration: none;
+}
+
+#locations li a:hover {
+	color: #fff;
+	text-decoration: none;
+}
+
+#locations li {
+	padding: 10px 20px;
+}
+
+#locations li:hover {
+	background: #565C61;
+	color: #fff;
+}
+
+
+.main-menu-nav {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+div .main-menu-nav a:link {
+	color: #3d464d;
+	text-decoration: none;
+}
+
+div .main-menu-nav a:visited {
+	color: #3d464d;
+	text-decoration: none;
+}
+
+div .main-menu-nav a:hover {
+	color: #fff;
+	text-decoration: none;
+}
+
+.main-menu-nav li {
+	padding: 10px 20px;
+}
+
+.main-menu-nav li:hover {
+	background: #565C61;
+	color: #fff;
+}
+
+/*
+App Header
+*/
+.ui-content, .ui-page, .ui-body-c, .ui-header, .ui-header-fixed{
+	background: white !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	font-family: Ubuntu, Arial, sans-serif !important;
+}
+#app-header, h1, h2, h3, ul, li, p, span, .ui-title, .ui-content {
+	text-shadow: none !important;
+}
+
+.ui-header, .ui-header-fixed {
+	border: none;
+	border-bottom: 1px solid #3d464d;
+}
+
+#app-header {
+	height: 51spx;
+}
+
+#app-header h1 {
+	
+	font-size: 150%;
+	color: #3d464d;
+	font-weight: lighter;
+	text-align: left;
+	margin: 15px 20px;
+}
+
+#app-header {
+	position: relative;
+}
+
+#details-menu, #app-menu, #map-menu {
+	top: 0;
+	right: 20px;
+	position: absolute;
+}
+
+/*
+ * Banner styling
+ */
+ 
+#banner {
+	background: url(../images/icons/marina.png) no-repeat;
+	background-size: contain;
+	background-attachment: fixed;
+	-webkit-background-size: contain;
+	-webkit-background-attachment: fixed;
+	width: 100%;
+	height: 144px;
+	margin: 60px 0 0 0;
+	padding: 0;
+}
+
+/*
+Current Conditions view
+*/
+
+.ui-btn-text {
+	font-size: 90%;	
+}
+
+.ui-btn-corner-all {
+	border: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: #fff url(../images/icons/station.png) no-repeat;
+	margin: 0 0 0 30px;
+	padding: 0 0 0 30px;
+	text-align: left;
+}
+
+#current-location {
+	background: #fff url(../images/weather/clear-day.png) 10px top no-repeat;
+	height: 55px;
+	padding: 17px 0 0 80px;
+	margin: 10px 0 0 0;
+	border-bottom: 1px solid #D4D4D4;
+	cursor: pointer;
+}
+
+
+#current-conditions {
+	list-style: none;
+	margin: 0 0 0 30px;
+	padding: 0;
+}
+
+#current-conditions li {
+	height: 35px;
+	padding: 15px 0 0 50px;
+	font-size: 90%;
+	border-bottom: 1px solid #D4D4D4;
+}
+
+#current-conditions #water-temp {
+	background: url(../images/icons/water-temp.png) no-repeat;
+}
+
+#current-conditions #tides {
+	background: url(../images/icons/tides.png) no-repeat;
+}
+
+#current-conditions #waves {
+	background: url(../images/icons/waves.png) no-repeat;
+}
+
+#current-conditions #winds {
+	background: url(../images/icons/wind.png) no-repeat;
+}
+
+#current-conditions #station {
+	background: url(../images/icons/station.png) no-repeat;
+	border: none;
+}
+
+#current-conditions .obs {
+	float: right;
+	margin-right: 20px;
+}
+
+/* Detailed weather view styles
+ * 
+ */
+ 
+#banner-details {
+	background: #273949;
+	color: #fff;
+	width: 100%;
+	height: 144px;
+	margin: 60px 0 0 0;
+	padding: 10px 0 0 0;
+	box-shadow: inset 0  8px 8px -8px #000000;
+	-moz-box-shadow: inset 0  8px 8px -8px #000000;
+	-webkit-box-shadow: inset 0  8px 8px -8px #000000;
+}
+
+#current-weather {
+	background: url(../images/weather/partly-cloudy-b.png) no-repeat;
+	height: 65px;
+	width: 200px;
+	margin: 0 auto;
+	padding: 15px 0 0 75px;
+	font-weight: normal;
+}
+
+#short-details {
+	list-style: none;
+	margin: 0 0 0 10px;
+	padding: 0;
+	font-size: 110%;
+}
+
+#short-details .rain-chance {
+	float: right;
+	margin: 0 10px 0 0;
+}
+
+#short-details .uv {
+	float: right;
+	margin: 0 10px 0 0;
+}
+
+#detailed-conditions {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	font-weight: bold;
+}
+
+#detailed-conditions li {
+	height: 35px;
+	padding: 15px 0 0 50px;
+	font-size: 90%;
+	border-bottom: 1px solid #D4D4D4;
+}
+
+#detailed-conditions .obs {
+	float: right;
+	margin-right: 20px;
+}
+
+#detailed-conditions #current-temp {
+	background: url(../images/icons/temp.png) no-repeat;
+}
+
+#detailed-conditions #humidity {
+	background: url(../images/icons/humidity.png) no-repeat;
+}
+
+#detailed-conditions #waves {
+	background: url(../images/icons/waves.png) no-repeat;
+}
+
+#detailed-conditions #winds {
+	background: url(../images/icons/wind.png) no-repeat;
+}
+
+#detailed-conditions #wind-gust {
+	background: url(../images/icons/wind-gust.png) no-repeat;
+}
+
+#detailed-conditions #sunrise {
+	background: url(../images/icons/sunrise.png) no-repeat;
+}
+
+#detailed-conditions #sunset {
+	background: url(../images/icons/sunset.png) no-repeat;
+	border: none;
+}
+
+/*
+ * Style for weather map
+ */
+
+#map_canvas {
+	height: 480px;
+}
