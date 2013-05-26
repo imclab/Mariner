@@ -1,0 +1,16 @@
+$.ajax({
+    type: "GET",
+    url: "testOrders.xml",
+    dataType: "xml",
+    success: function(xml) {
+      $(xml).find('order').each(function(){
+        orderId = $(this).find("orderId").text();
+        city = $(this).find("city").text();
+        state = $(this).find("state").text();
+        zip = $(this).find("zip").text();
+        db.transaction(function (tx) {
+           tx.executeSql('INSERT INTO orders (id, city, state, zip) VALUES      (orderId,city,state,zip)');
+        });
+            });
+        }
+     });
