@@ -15,7 +15,7 @@
         A weather applications specifically for fishing and boating. Specifically offering multiple point marine, tide and astronomical forecasts.
     </description>
 
-    <author href="https://build.phonegap.com" email="support@phonegap.com">
+    <author href="http://www.jeffdevelops.com" email="jeff@jeffdevelops.com">
         Jeff Stewart 
     </author>
     
@@ -25,7 +25,6 @@
 	<preference name="permissions" value="none"/> -->
 
 	<!-- to enable individual permissions use the following examples -->
-	<plugin name="Storage" value="org.apache.cordova.Storage" />
 	<feature name="http://api.phonegap.com/1.0/file"/>
 	<feature name="http://api.phonegap.com/1.0/geolocation"/>
 	<feature name="http://api.phonegap.com/1.0/network"/>
