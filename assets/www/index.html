@@ -26,11 +26,21 @@
     // Populate the database 
     //
     function populateDB(tx) {
-		//alert('populateDB');
+		//Check to see if we already have tables
+		$.mobile.loading( "show", {
+			text: "Initializing application",
+			textVisible: true,
+			theme: "a",
+			html: ""
+			});
+		var stationsTable = localStorage.getItem("stationsTable");
+		if(stationsTable != null){
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+			db.transaction(queryDB, errorCB);
+		}else{
         tx.executeSql('DROP TABLE IF EXISTS STATIONS');
         tx.executeSql('CREATE TABLE IF NOT EXISTS STATIONS (stationID INTEGER PRIMARY KEY, stationName VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20))');
         //fetch stations
-		  
 		 $.ajax({
 			type: "GET",
 			url: "http://opendap.co-ops.nos.noaa.gov/axis/webservices/activestations/response.jsp?v=2&format=xml",
@@ -49,11 +59,12 @@
 					});
 					//alert("ID: " + $stationID + " Name: " + $stationName + " Lat: " + $lat + " Lon: " + $lon);
 				});
-				
+				localStorage.setItem("stationsTable", 'true');
 				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
 				db.transaction(queryDB, errorCB);
 			}
 		  });
+	  }
     }
     
 
@@ -67,11 +78,15 @@
     //
     function querySuccess(tx, results) {
 		var len = results.rows.length;
-        alert("STATIONS table: " + len + " rows found.");
+        //alert("STATIONS table: " + len + " rows found.");
         for (var i=0; i<len; i++){
             $('#local-stations').append("<option>ID = " + results.rows.item(i).stationID + " Station Name =  " + results.rows.item(i).stationName + " Station Latitude =  " + results.rows.item(i).lat + " Station Longitude =  " + results.rows.item(i).lon + "</option>");
         }
+        $.mobile.loading( "hide" );
     }
+
+
+
 
     // Transaction error callback
     //
@@ -108,6 +123,8 @@
 		
 		$('#add-location').click(function() {
 			$("#stations-panel").panel( "close" );
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+			db.transaction(populateLocations, errorCB, successCB);
 			
 		});
 		
