@@ -22,8 +22,54 @@
     /// Wait for PhoneGap to load
     //
     document.addEventListener("deviceready", onDeviceReady, false);
+    
+    // Populate the Locations database 
+    //
+    function locationsDB(tx) {
+		tx.executeSql('DROP TABLE IF EXISTS LOCATIONS');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS LOCATIONS (zipcode INTEGER PRIMARY KEY, placename VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20))');
+		var zipcode = prompt("Please enter a ZIP code","70458");
+		if (zipcode!=null && zipcode!="")	  {
+	  
+	  $.ajax({
+		type: "GET",
+		url: "http://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?listZipCodeList=" + zipcode,
+		dataType: "xml",
+		success: function(xml){
+			$latLon = $(xml).find("latLonList").text();
+			$myLat = $latLon.split(",")[0];
+			$myLon = $latLon.split(",")[1];
+		// end first AJAX onSuccess
+		}
+	  });
+	  
+	  //fetch city, state
+		  $.ajax({
+		  url: "http://zip.elevenbasetwo.com",
+		  dataType: "json",
+		  type: "GET",
+		  data: "zip=" + zipcode,
+		  success: function(result, success) {
+			  $myCityState = result.city + ", " + result.state;
+			  //add everything to database
+			
+			//alert('start SQL statement');
+			
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
+			db.transaction(function (tx) {
+			tx.executeSql('INSERT INTO LOCATIONS (zipcode, placename, lat, lon) VALUES (?, ?, ?, ?)',[zipcode, $myCityState, $myLat, $myLon]);
+			});
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
+			db.transaction(queryLocations, errorCB);
+			  }
+		});
+	  
+	  
+	  //end if(zipcode) prompt
+	  }
+    }
 
-    // Populate the database 
+    // Populate the Stations database 
     //
     function populateDB(tx) {
 		//Check to see if we already have tables
@@ -35,7 +81,7 @@
 			});
 		var stationsTable = localStorage.getItem("stationsTable");
 		if(stationsTable != null){
-			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 			db.transaction(queryDB, errorCB);
 		}else{
         tx.executeSql('DROP TABLE IF EXISTS STATIONS');
@@ -52,7 +98,7 @@
 					var $stationID = $(this).attr("ID");
 					var $lat = $(this).find("lat").text();
 					var $lon = $(this).find("long").text();	
-					var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+					var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 					db.transaction(function (tx) {
 					   tx.executeSql('INSERT INTO STATIONS (stationID, stationName, lat, lon) VALUES (?, ?, ?, ?)',[$stationID, $stationName, $lat, $lon]);
 					   
@@ -60,7 +106,7 @@
 					//alert("ID: " + $stationID + " Name: " + $stationName + " Lat: " + $lat + " Lon: " + $lon);
 				});
 				localStorage.setItem("stationsTable", 'true');
-				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 				db.transaction(queryDB, errorCB);
 			}
 		  });
@@ -84,6 +130,32 @@
         }
         $.mobile.loading( "hide" );
     }
+    
+    
+    
+    
+    // Query the Locations table
+    //
+    function queryLocations(tx) {
+		tx.executeSql('SELECT * FROM LOCATIONS', [], queryLocationsSuccess, errorCB2);
+    }
+
+    // Query the success callback for locations
+    //
+    function queryLocationsSuccess(tx, results) {
+		var len = results.rows.length;
+        //alert("LOCATIONS table: " + len + " rows found.");
+        for (var i=0; i<len; i++){
+            $('#locations').append("<li><a href='#' id='" + results.rows.item(i).zipcode + "'>" + results.rows.item(i).placename + "</a></li>");
+        }
+        
+        var waitTimer;
+		waitTimer=setTimeout(function(){
+			$("#locations").listview("refresh");
+		},1000);
+        
+        
+    }
 
 
 
@@ -92,6 +164,10 @@
     //
     function errorCB(err) {
         alert("Error processing SQL: "+err.code);
+    }
+    
+    function errorCB2(err) {
+        alert("Error processing SQL from SELECT * LOCATIONS: "+err.code);
     }
 
     // Transaction success callback
@@ -124,7 +200,7 @@
 		$('#add-location').click(function() {
 			$("#stations-panel").panel( "close" );
 			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
-			db.transaction(populateLocations, errorCB, successCB);
+			db.transaction(locationsDB, errorCB, successCB);
 			
 		});
 		
