@@ -26,8 +26,8 @@
     // Populate the Locations database 
     //
     function locationsDB(tx) {
-		tx.executeSql('DROP TABLE IF EXISTS LOCATIONS');
-		tx.executeSql('CREATE TABLE IF NOT EXISTS LOCATIONS (zipcode INTEGER PRIMARY KEY, placename VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20))');
+		//tx.executeSql('DROP TABLE IF EXISTS LOCATIONS');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS LOCATIONS (zipcode INTEGER PRIMARY KEY, placename VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20), isdefault INTEGER)');
 		var zipcode = prompt("Please enter a ZIP code","70458");
 		if (zipcode!=null && zipcode!="")	  {
 	  
@@ -57,11 +57,19 @@
 			
 			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 			db.transaction(function (tx) {
-			tx.executeSql('INSERT INTO LOCATIONS (zipcode, placename, lat, lon) VALUES (?, ?, ?, ?)',[zipcode, $myCityState, $myLat, $myLon]);
+				
+				var $dialogBox = confirm("Set " + $myCityState + " as your default location?");
+				if ($dialogBox==true){
+					 tx.executeSql('UPDATE LOCATIONS SET isdefault = NULL WHERE isdefault = 1');
+					tx.executeSql('INSERT INTO LOCATIONS (zipcode, placename, lat, lon, isdefault) VALUES (?, ?, ?, ?, 1)',[zipcode, $myCityState, $myLat, $myLon]);
+				}else{
+				  tx.executeSql('INSERT INTO LOCATIONS (zipcode, placename, lat, lon) VALUES (?, ?, ?, ?)',[zipcode, $myCityState, $myLat, $myLon]);
+				}
+				
 			});
 			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 			db.transaction(queryLocations, errorCB);
-			  }
+			}
 		});
 	  
 	  
@@ -73,17 +81,17 @@
     //
     function populateDB(tx) {
 		//Check to see if we already have tables
-		$.mobile.loading( "show", {
+		var stationsTable = localStorage.getItem("stationsTable");
+		if(stationsTable != null){
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
+			db.transaction(queryLocations, errorCB);
+		}else{
+			$.mobile.loading( "show", {
 			text: "Initializing application",
 			textVisible: true,
 			theme: "a",
 			html: ""
 			});
-		var stationsTable = localStorage.getItem("stationsTable");
-		if(stationsTable != null){
-			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
-			db.transaction(queryDB, errorCB);
-		}else{
         tx.executeSql('DROP TABLE IF EXISTS STATIONS');
         tx.executeSql('CREATE TABLE IF NOT EXISTS STATIONS (stationID INTEGER PRIMARY KEY, stationName VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20))');
         //fetch stations
@@ -107,7 +115,7 @@
 				});
 				localStorage.setItem("stationsTable", 'true');
 				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
-				db.transaction(queryDB, errorCB);
+				db.transaction(queryLocations, errorCB);
 			}
 		  });
 	  }
@@ -125,6 +133,7 @@
     function querySuccess(tx, results) {
 		var len = results.rows.length;
         //alert("STATIONS table: " + len + " rows found.");
+        $('#local-stations').html('');
         for (var i=0; i<len; i++){
             $('#local-stations').append("<option>ID = " + results.rows.item(i).stationID + " Station Name =  " + results.rows.item(i).stationName + " Station Latitude =  " + results.rows.item(i).lat + " Station Longitude =  " + results.rows.item(i).lon + "</option>");
         }
@@ -137,6 +146,8 @@
     // Query the Locations table
     //
     function queryLocations(tx) {
+		//tx.executeSql('DROP TABLE IF EXISTS LOCATIONS');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS LOCATIONS (zipcode INTEGER PRIMARY KEY, placename VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20), isdefault INTEGER)');
 		tx.executeSql('SELECT * FROM LOCATIONS', [], queryLocationsSuccess, errorCB2);
     }
 
@@ -145,8 +156,13 @@
     function queryLocationsSuccess(tx, results) {
 		var len = results.rows.length;
         //alert("LOCATIONS table: " + len + " rows found.");
+        $('#locations').html('');
         for (var i=0; i<len; i++){
             $('#locations').append("<li><a href='#' id='" + results.rows.item(i).zipcode + "'>" + results.rows.item(i).placename + "</a></li>");
+            if(results.rows.item(i).isdefault == 1){
+				$('#current-location').text(results.rows.item(i).placename);
+				//call function to retreive weather information
+			}
         }
         
         var waitTimer;
