@@ -62,8 +62,7 @@
 	// Query the database
     //
     function queryDB(tx) {
-		alert('query stations table');
-        tx.executeSql('SELECT * FROM STATIONS', [], querySuccess, errorCB);
+		tx.executeSql('SELECT * FROM STATIONS', [], querySuccess, errorCB);
     }
 
     // Query the success callback
@@ -71,7 +70,7 @@
     function querySuccess(tx, results) {
 		$('#test').html('');
         var len = results.rows.length;
-        console.log("STATIONS table: " + len + " rows found.");
+        alert("STATIONS table: " + len + " rows found.");
         for (var i=0; i<len; i++){
             $('#test').append("Row = " + i + " ID = " + results.rows.item(i).stationID + " Station Name =  " + results.rows.item(i).stationName + " Station Latitude =  " + results.rows.item(i).lat + " Station Longitude =  " + results.rows.item(i).lon + "<br />");
         }
@@ -80,7 +79,7 @@
     // Transaction error callback
     //
     function errorCB(err) {
-        console.log("Error processing SQL: "+err.code);
+        alert("Error processing SQL: "+err.code);
     }
 
     // Transaction success callback
