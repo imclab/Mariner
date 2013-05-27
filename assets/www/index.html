@@ -10,7 +10,7 @@
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-	<script src="phonegap.js"></script>
+	<script type="text/javascript" src="phonegap.js"></script>
 
 </head>
 
@@ -29,8 +29,6 @@
 		//alert('populateDB');
         tx.executeSql('DROP TABLE IF EXISTS STATIONS');
         tx.executeSql('CREATE TABLE IF NOT EXISTS STATIONS (stationID INTEGER PRIMARY KEY, stationName VARCHAR(70), lat VARCHAR(20), lon VARCHAR(20))');
-        //tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")');
-        //tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
         //fetch stations
 		  
 		 $.ajax({
@@ -38,20 +36,20 @@
 			url: "http://opendap.co-ops.nos.noaa.gov/axis/webservices/activestations/response.jsp?v=2&format=xml",
 			dataType: "xml",
 			success: function(xml) {
-				//alert('parse xml');
+				
 				$(xml).find('stationV2').each(function(){
-					$stationName = $(this).attr("name");
-					$stationID = $(this).attr("ID");
-					$stationState = $(this).find("state").text();
-					$lat = $(this).find("lat").text();
-					$lon = $(this).find("long").text();	
-					$fullName = $stationName;
+					var $stationName = $(this).attr("name");
+					var $stationID = $(this).attr("ID");
+					var $lat = $(this).find("lat").text();
+					var $lon = $(this).find("long").text();	
 					var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
 					db.transaction(function (tx) {
-					   tx.executeSql('INSERT INTO STATIONS (stationID, stationName, lat, lon) VALUES (2, "Second row", "Second row", "Second row")');
+					   tx.executeSql('INSERT INTO STATIONS (stationID, stationName, lat, lon) VALUES (?, ?, ?, ?)',[$stationID, $stationName, $lat, $lon]);
+					   
 					});
+					//alert("ID: " + $stationID + " Name: " + $stationName + " Lat: " + $lat + " Lon: " + $lon);
 				});
-				alert("ID: " + $stationID + " Name: " + $stationName + " Lat: " + $lat + " Lon: " + $lon);
+				
 				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
 				db.transaction(queryDB, errorCB);
 			}
@@ -68,11 +66,10 @@
     // Query the success callback
     //
     function querySuccess(tx, results) {
-		$('#test').html('');
-        var len = results.rows.length;
+		var len = results.rows.length;
         alert("STATIONS table: " + len + " rows found.");
         for (var i=0; i<len; i++){
-            $('#test').append("Row = " + i + " ID = " + results.rows.item(i).stationID + " Station Name =  " + results.rows.item(i).stationName + " Station Latitude =  " + results.rows.item(i).lat + " Station Longitude =  " + results.rows.item(i).lon + "<br />");
+            $('#local-stations').append("<option>ID = " + results.rows.item(i).stationID + " Station Name =  " + results.rows.item(i).stationName + " Station Latitude =  " + results.rows.item(i).lat + " Station Longitude =  " + results.rows.item(i).lon + "</option>");
         }
     }
 
@@ -85,8 +82,8 @@
     // Transaction success callback
     //
     function successCB() {
-       // var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
-       // db.transaction(queryDB, errorCB);
+       //var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+       //db.transaction(queryDB, errorCB);
     }
 	
 	// PhoneGap is ready
