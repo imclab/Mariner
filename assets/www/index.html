@@ -82,6 +82,7 @@
     function populateDB(tx) {
 		//Check to see if we already have tables
 		var stationsTable = localStorage.getItem("stationsTable");
+		//alert(stationsTable);
 		if(stationsTable != null){
 			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 			db.transaction(queryLocations, errorCB);
@@ -116,13 +117,14 @@
 				localStorage.setItem("stationsTable", 'true');
 				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 				db.transaction(queryLocations, errorCB);
+				//db.transaction(queryDB, errorCB);
 			}
 		  });
 	  }
     }
     
 
-	// Query the database
+	// Query the STATIONS table
     //
     function queryDB(tx) {
 		tx.executeSql('SELECT * FROM STATIONS', [], querySuccess, errorCB);
@@ -135,6 +137,7 @@
         //alert("STATIONS table: " + len + " rows found.");
         $('#local-stations').html('');
         for (var i=0; i<len; i++){
+			//formula
             $('#local-stations').append("<option>ID = " + results.rows.item(i).stationID + " Station Name =  " + results.rows.item(i).stationName + " Station Latitude =  " + results.rows.item(i).lat + " Station Longitude =  " + results.rows.item(i).lon + "</option>");
         }
         $.mobile.loading( "hide" );
@@ -161,7 +164,43 @@
             $('#locations').append("<li><a href='#' id='" + results.rows.item(i).zipcode + "'>" + results.rows.item(i).placename + "</a></li>");
             if(results.rows.item(i).isdefault == 1){
 				$('#current-location').text(results.rows.item(i).placename);
+				var currentLat = results.rows.item(i).lat;
+				var currentLon = results.rows.item(i).lon;
+				//alert($currentLat + ", " + $currentLon);
+				// Get NOAA stations
+				
+				var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
+				tx.executeSql('SELECT * FROM STATIONS', [], function(tx, results){
+				var distanceArray = [];
+				distanceArray["distance"] = 90;
+				var len = results.rows.length;
+				//alert(currentLat + ", " + currentLon);
+				for (var i=0; i<len; i++){
+					lat1 = currentLat * Math.PI / 180;
+					lat2 = results.rows.item(i).lat * Math.PI / 180;
+					lon1 = currentLon * Math.PI / 180;
+					lon2 = results.rows.item(i).lon * Math.PI / 180;
+					var R = 6371; // km
+					var d = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2-lon1)) * R;
+					if(d < 90){
+						if(d < distanceArray["distance"]){
+							distanceArray["distance"] = d;
+							distanceArray["station"] = results.rows.item(i).stationID;
+						}
+					$('#local-stations').append("<option value='" + results.rows.item(i).stationID + "'>" + results.rows.item(i).stationName + "</option>");
+					
+					}
+					
+					
+					
+				}
+				//alert('finished getting noaa stations');
+				//alert(distanceArray["station"]);
+				$('#local-stations option[value=' + distanceArray["station"] + ']').prop('selected', true);
+				
+				}, errorCB2);
 				//call function to retreive weather information
+				
 			}
         }
         
@@ -196,7 +235,7 @@
 	// PhoneGap is ready
     //
     function onDeviceReady() {
-        var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+        var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
         db.transaction(populateDB, errorCB, successCB);
     }
 	
@@ -215,13 +254,13 @@
 		
 		$('#add-location').click(function() {
 			$("#stations-panel").panel( "close" );
-			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 200000);
+			var db = window.openDatabase("MarineDB", "1.0", "Marine Weather", 500000);
 			db.transaction(locationsDB, errorCB, successCB);
 			
 		});
 		
 		$("#locations").on("click", "a", function(event){
-			
+			alert('ZIPCODE: ' + $(this).attr('id'));
 		});
 		
 		
@@ -273,9 +312,7 @@
 		</ul>
 		
 		<select id="local-stations">
-			<!--<option>BAYOU BON FOUCA, LA</option>
-			<option>SHELL BEACH, LA</option>
-			<option>GRAND ISLE, LA</option>-->
+			
 		</select>
 		
 	</div><!-- /content -->
